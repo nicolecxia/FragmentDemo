@@ -14,8 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -40,7 +38,6 @@ class SignInFragment : Fragment() {
         // Inflate the layout for this fragment
 //        return inflater.inflate(R.layout.fragment_sign_in, container, false)
 
-
         binding = FragmentSignInBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -48,14 +45,19 @@ class SignInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        signInViewModel = ViewModelProvider(this)[SignInViewModel::class.java]
-
+        //notice here the ViewModelProvider should be requireActivity() then it can been observed by host Activity
+        signInViewModel = ViewModelProvider(requireActivity())[SignInViewModel::class.java]
 
         binding.button.setOnClickListener {
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
 
-            signInViewModel.signIn(requireActivity(), email, pass)
+             signInViewModel.signIn(requireActivity(), email, pass)
+
+        }
+
+        signInViewModel.signInErrorMSG.observe(requireActivity()){ signInErrorMSG ->
+           binding.errMsg.text = signInErrorMSG
         }
 
     }

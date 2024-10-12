@@ -34,4 +34,11 @@ class SignInViewModel: ViewModel() {
         }
     }
 
+    fun signOut(){
+        firebaseAuth.signOut()
+
+        signInFlag.postValue(false)
+        userEmail.postValue(null)
+    }
+
 }

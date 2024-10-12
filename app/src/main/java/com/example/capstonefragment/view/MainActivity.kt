@@ -12,10 +12,12 @@ import com.example.capstonefragment.R
 import com.example.capstonefragment.databinding.ActivityMainBinding
 import com.example.capstonefragment.viewModel.SignInViewModel
 import com.google.firebase.auth.FirebaseAuth
+import android.content.Context
+import com.example.capstonefragment.viewModel.NetworkLiveData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    public lateinit var firebaseAuth: FirebaseAuth
+    lateinit var firebaseAuth: FirebaseAuth
 
     //ViewModel
     private lateinit var signInViewModel: SignInViewModel
@@ -35,49 +37,58 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         signInViewModel = ViewModelProvider(this)[SignInViewModel::class.java]
 
-      //if user already login in, no need show the login fragment
-        if (firebaseAuth.currentUser != null){
-            jumpToServicesFlagment()
-        }
-
-        binding.button2.setOnClickListener{
-            firebaseAuth.signInWithEmailAndPassword("123@qq.com", "123456")
-                .addOnCompleteListener {  it ->
-                    if (it.isSuccessful) {
-                        binding.textView2.text = "successed"
-
-                    } else {
-                        binding.textView2.text = "failed"
-                    }
-                }
-//            signInViewModel.userEmail.value = "testLivedata"
-        }
 
 
         listenSignInLiveData()
     }
 
-    private fun jumpToServicesFlagment(){
+    override fun onStart() {
+        super.onStart()
+
+        if (firebaseAuth.currentUser != null) {
+            jumpToServicesFragment()
+        } else {
+            jumpToSignInFragment()
+        }
+
+    }
+
+    private fun jumpToServicesFragment() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-        if (currentFragment is SignInFragment){
-            val trans = supportFragmentManager.beginTransaction().add(R.id.fragmentContainer,ServicesListFragment())
+        if (currentFragment is SignInFragment) {
+            val trans = supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, ServicesListFragment())
+            trans.addToBackStack(null)
+            trans.commit()
+        }
+    }
+
+    private fun jumpToSignInFragment() {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (currentFragment !is SignInFragment) {
+            val trans = supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, SignInFragment())
             trans.addToBackStack(null)
             trans.commit()
         }
     }
 
     private fun listenSignInLiveData() {
-        signInViewModel.userEmail.observe(this){ userEmail ->
-            binding.textView2.text = userEmail
+        signInViewModel.userEmail.observe(this) { userEmail ->
+            val sharedata = getSharedPreferences(
+                "AccountInfo",
+                Context.MODE_PRIVATE
+            )  //create shareddate named ‘counterdata’
+            val editor = sharedata.edit()
+            editor.putString("email", userEmail)   //put date into shareddate.edit, key-vakue pairs
+            editor.commit()
         }
 
-        signInViewModel.signInErrorMSG.observe(this){ signInErrorMSG ->
-            binding.textView2.text = signInErrorMSG
-        }
-
-        signInViewModel.signInFlag.observe(this){ flag ->
-            if (flag){
-                jumpToServicesFlagment()
+        signInViewModel.signInFlag.observe(this) { flag ->
+            if (flag) {
+                jumpToServicesFragment()
+            } else {
+                jumpToSignInFragment()
             }
         }
     }
