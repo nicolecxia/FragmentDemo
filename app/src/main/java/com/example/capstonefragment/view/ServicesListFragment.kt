@@ -64,27 +64,34 @@ class ServicesListFragment : Fragment() {
             signInViewModel.signOut()
         }
 
-        binding.btnAdd.setOnClickListener{
+        binding.btnAdd.setOnClickListener {
 //            servicesListViewModel.addToCart("123","Test add to cart")
-            servicesListViewModel.getCartByUser("123")
+
+//            servicesListViewModel.getCartByUser("123")
+
+            servicesListViewModel.getServiceList()
         }
 
-        servicesListViewModel.getCartByUserFlag.observe(requireActivity()){ addedFlag ->
-          if (!addedFlag){
-              binding.tvUserInfo.text = "Get Cart Info Error"
-          }
-        }
+        listinLiveData()
+    }
 
-        servicesListViewModel.cartLists.observe(requireActivity()){ cartLists ->
+    private fun listinLiveData() {
+        servicesListViewModel.cartLists.observe(requireActivity()) { cartLists ->
             var value: String = ""
-            for (cart in cartLists){
+            for (cart in cartLists) {
                 value += "${cart.userID}/${cart.serviceID} \n"
             }
             binding.textView3.text = value
         }
 
+        servicesListViewModel.serviceLists.observe(requireActivity()) { serviceLists ->
+            var value: String = ""
+            for (service in serviceLists) {
+                value += "${service.serviceName}/${service.stylist} \n"
+            }
+            binding.textView3.text = value
+        }
     }
-
 
 
     companion object {
