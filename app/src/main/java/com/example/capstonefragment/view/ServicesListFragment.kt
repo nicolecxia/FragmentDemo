@@ -64,6 +64,25 @@ class ServicesListFragment : Fragment() {
             signInViewModel.signOut()
         }
 
+        binding.btnAdd.setOnClickListener{
+//            servicesListViewModel.addToCart("123","Test add to cart")
+            servicesListViewModel.getCartByUser("123")
+        }
+
+        servicesListViewModel.getCartByUserFlag.observe(requireActivity()){ addedFlag ->
+          if (!addedFlag){
+              binding.tvUserInfo.text = "Get Cart Info Error"
+          }
+        }
+
+        servicesListViewModel.cartLists.observe(requireActivity()){ cartLists ->
+            var value: String = ""
+            for (cart in cartLists){
+                value += "${cart.userID}/${cart.serviceID} \n"
+            }
+            binding.textView3.text = value
+        }
+
     }
 
 

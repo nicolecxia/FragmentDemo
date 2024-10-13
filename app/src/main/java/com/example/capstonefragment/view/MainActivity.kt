@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun jumpToServicesFragment() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-        if (currentFragment is SignInFragment) {
+        if (currentFragment !is ServicesListFragment) {
             val trans = supportFragmentManager.beginTransaction()
                 .add(R.id.fragmentContainer, ServicesListFragment())
             trans.addToBackStack(null)
